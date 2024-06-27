@@ -1,21 +1,27 @@
+import { z } from 'zod';
+
 export interface PlaceAutocompleteResult {
     placeId: string;
-    streetNumber: string;
+    streetNumber: string|undefined;
     countryCode: string;
     country: string;
     freeformAddress: string;
+    municipality: string|undefined;
 }
+export const ResultsZ = z.array(
+    z.object({
+        id: z.string(),
+        address: z.object({
+            streetNumber: z.string().optional(),
+            countryCode: z.string(),
+            country: z.string(),
+            freeformAddress: z.string(),
+            municipality: z.string().optional()
+        })
+    })
+)
 
-export interface Result {
-    id: string;
-    address: {
-        streetNumber: string;
-        countryCode: string;
-        country: string;
-        freeformAddress: string;
-        municipality: string;
-    }
-}
+type Results = z.infer<typeof ResultsZ>
 
 export interface TomtomParams {
     key: string;
@@ -38,7 +44,7 @@ export interface TomtomResponse {
         }
     }
     queryIntent: QueryIntentObject[]
-    results: Result[];
+    results: Results;
 }
 
 type QueryIntentObject = CoordinateIntentObject|NearbyIntentObject|W3WIntentObject|BookmarkIntentObject;

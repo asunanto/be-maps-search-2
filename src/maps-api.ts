@@ -1,6 +1,5 @@
 import axios, { AxiosResponse } from 'axios'
-import { PlaceAutocompleteResult, TomtomParams, TomtomResponse } from './interfaces'
-
+import { PlaceAutocompleteResult, ResultsZ, TomtomParams, TomtomResponse } from './interfaces'
 
 // https://developer.tomtom.com/search-api/documentation/search-service/fuzzy-search
 
@@ -24,16 +23,18 @@ export async function getPlaceAutocomplete(address: string, countrySet: string =
     const response: AxiosResponse<TomtomResponse> = await axios.get<TomtomParams, AxiosResponse<TomtomResponse>>(
         `https://api.tomtom.com/search/2/search/${address}.json'`,
         {
-            params: { key, countrySet,limit },
+            params: { key, countrySet, limit },
         }
-    );
+    );    
+
+    ResultsZ.parse(response.data.results)
 
     return response.data.results.map((result) => ({
         placeId: result.id,
-        streetNumber: result.address.streetNumber,
+        streetNumber: result.address?.streetNumber,
         countryCode: result.address.countryCode,
         country: result.address.country,
         freeformAddress: result.address.freeformAddress,
-        municipality: result.address.municipality    
+        municipality: result.address?.municipality    
      }));
 }
